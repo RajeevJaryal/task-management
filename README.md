@@ -42,10 +42,3 @@ It supports authentication, role-based dashboards, and complete task management 
 - **Backend:** Firebase (Auth + Firestore)  
 
 ---
-
-## ⚙️ Setup & Installation
-
-### 1️⃣ Clone the repository
-```bash
-git clone <your-repo-link>
-cd teamflow
