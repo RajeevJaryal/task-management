@@ -1,5 +1,13 @@
+import React from "react";
+
+// ✅ safer hex to rgba (handles #fff also)
 function hexToRgba(hex, alpha = 0.03) {
-  const value = hex.replace("#", "");
+  let value = hex.replace("#", "");
+
+  if (value.length === 3) {
+    value = value.split("").map((c) => c + c).join("");
+  }
+
   const r = parseInt(value.substring(0, 2), 16);
   const g = parseInt(value.substring(2, 4), 16);
   const b = parseInt(value.substring(4, 6), 16);
@@ -7,21 +15,23 @@ function hexToRgba(hex, alpha = 0.03) {
   return `rgba(${r}, ${g}, ${b}, ${alpha})`;
 }
 
+// ✅ FIXED: no property attached to array
 export function makeBarData(solidColor) {
-  const bars = new Array(120).fill(100);
-  bars.solidColor = solidColor;
-  return bars;
+  return {
+    data: new Array(120).fill(100),
+    solidColor,
+  };
 }
 
+// ✅ StatCard
 export function StatCard({ title, subtitle, value, bars }) {
   const safeBars = bars || makeBarData("#3b82f6");
 
   return (
-    <div className="bg-white overflow-hidden">
+    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
       <div className="px-2 pt-3 pb-2 flex justify-between items-start">
         <div>
           <h3 className="text-[11px] font-semibold text-gray-700">{title}</h3>
-
           <p className="text-[9px] text-gray-400 mt-0.5">{subtitle}</p>
         </div>
 
@@ -31,7 +41,7 @@ export function StatCard({ title, subtitle, value, bars }) {
       </div>
 
       <div className="h-14 flex gap-[1px] items-end overflow-visible">
-        {safeBars.map((_, i) => (
+        {safeBars.data.map((_, i) => (
           <div
             key={i}
             className="w-[1px] shrink-0"
@@ -62,6 +72,7 @@ export function StatCard({ title, subtitle, value, bars }) {
   );
 }
 
+// ✅ Badge (minor improvement)
 export function Badge({ status }) {
   const styles = {
     pending: "bg-orange-50 text-orange-500 border border-orange-200",
@@ -73,8 +84,8 @@ export function Badge({ status }) {
     status === "progress"
       ? "In Progress"
       : status
-        ? status[0].toUpperCase() + status.slice(1)
-        : "Pending";
+      ? status[0].toUpperCase() + status.slice(1)
+      : "Pending";
 
   return (
     <span
@@ -87,10 +98,17 @@ export function Badge({ status }) {
   );
 }
 
+// ✅ Modal (added click outside close)
 export function Modal({ title, onClose, children }) {
   return (
-    <div className="fixed inset-0 bg-black/25 flex items-center justify-center z-50">
-      <div className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4">
+    <div
+      onClick={onClose}
+      className="fixed inset-0 bg-black/25 flex items-center justify-center z-50"
+    >
+      <div
+        onClick={(e) => e.stopPropagation()}
+        className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4"
+      >
         <div className="flex justify-between items-center px-5 pt-5 pb-1">
           {title && (
             <h2 className="text-base font-bold text-gray-900">{title}</h2>
