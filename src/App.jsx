@@ -1,11 +1,6 @@
 import { useEffect } from "react";
-import {
-  BrowserRouter,
-  Routes,
-  Route,
-  Navigate,
-} from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 
 import { loadCurrentUser } from "./store/authSlice";
 
@@ -16,6 +11,24 @@ import Dashboard from "./pages/Dashboard";
 import Tasks from "./pages/Tasks";
 
 import ProtectedRoute from "./routes/ProtectedRoute";
+
+function PublicRoute({ children }) {
+  const { user, initialized } = useSelector((s) => s.auth);
+
+  if (!initialized) {
+    return (
+      <div className="grid min-h-dvh place-items-center text-sm text-gray-400">
+        Loading...
+      </div>
+    );
+  }
+
+  if (user) {
+    return <Navigate to={user.role ? "/dashboard" : "/choose-role"} replace />;
+  }
+
+  return children;
+}
 
 export default function App() {
   const dispatch = useDispatch();
@@ -29,8 +42,23 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        <Route path="/login" element={<Login />} />
-        <Route path="/signup" element={<Signup />} />
+        <Route
+          path="/login"
+          element={
+            <PublicRoute>
+              <Login />
+            </PublicRoute>
+          }
+        />
+
+        <Route
+          path="/signup"
+          element={
+            <PublicRoute>
+              <Signup />
+            </PublicRoute>
+          }
+        />
 
         <Route
           path="/choose-role"
