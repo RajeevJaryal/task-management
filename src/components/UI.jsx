@@ -1,78 +1,131 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
 
-// ✅ safer hex to rgba (handles #fff also)
-function hexToRgba(hex, alpha = 0.03) {
-  let value = hex.replace("#", "");
-
-  if (value.length === 3) {
-    value = value.split("").map((c) => c + c).join("");
-  }
-
-  const r = parseInt(value.substring(0, 2), 16);
-  const g = parseInt(value.substring(2, 4), 16);
-  const b = parseInt(value.substring(4, 6), 16);
-
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
-}
-
-// ✅ FIXED: no property attached to array
 export function makeBarData(solidColor) {
-  return {
-    data: new Array(120).fill(100),
-    solidColor,
-  };
+  return { solidColor };
 }
 
-// ✅ StatCard
 export function StatCard({ title, subtitle, value, bars }) {
-  const safeBars = bars || makeBarData("#3b82f6");
+  const cardRef = useRef(null);
+  const canvasRef = useRef(null);
+
+  const color = bars?.solidColor ?? "#3b82f6";
+
+  const getRgb = (hex) => {
+    let v = hex.replace("#", "");
+    if (v.length === 3) v = v.split("").map((c) => c + c).join("");
+    return [
+      parseInt(v.substring(0, 2), 16),
+      parseInt(v.substring(2, 4), 16),
+      parseInt(v.substring(4, 6), 16),
+    ];
+  };
+
+  const drawBars = () => {
+    const canvas = canvasRef.current;
+    const card = cardRef.current;
+    if (!canvas || !card) return;
+
+    const dpr = window.devicePixelRatio || 1;
+    const W = card.offsetWidth;
+    const H = card.offsetHeight;
+
+    canvas.style.width = `${W}px`;
+    canvas.style.height = `${H}px`;
+    canvas.width = Math.round(W * dpr);
+    canvas.height = Math.round(H * dpr);
+
+    const ctx = canvas.getContext("2d");
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    const BAR_W = Math.round(2 * dpr);
+    const GAP   = Math.round(2 * dpr);
+    const STEP  = BAR_W + GAP;
+
+    const totalPhysW = Math.round(W * dpr);
+    const count = Math.ceil(totalPhysW / STEP);
+
+    const [r, g, b] = getRgb(color);
+    const physH = Math.round(H * dpr);
+
+    for (let i = 0; i < count; i++) {
+      const x = i * STEP;
+      const isFirst = i === 0;
+      const barH = Math.round((isFirst ? physH : physH * 0.56));
+      const y = physH - barH;
+
+      const grad = ctx.createLinearGradient(x, physH, x, y);
+      if (isFirst) {
+        grad.addColorStop(0,    `rgba(${r},${g},${b},0.0)`);
+        grad.addColorStop(0.08, `rgba(${r},${g},${b},0.05)`);
+        grad.addColorStop(0.18, `rgba(${r},${g},${b},0.15)`);
+        grad.addColorStop(0.32, `rgba(${r},${g},${b},0.35)`);
+        grad.addColorStop(0.52, `rgba(${r},${g},${b},1)`);
+        grad.addColorStop(1,    `rgba(${r},${g},${b},1)`);
+      } else {
+        grad.addColorStop(0,    `rgba(${r},${g},${b},0.0)`);
+        grad.addColorStop(0.15, `rgba(${r},${g},${b},0.05)`);
+        grad.addColorStop(0.30, `rgba(${r},${g},${b},0.15)`);
+        grad.addColorStop(0.50, `rgba(${r},${g},${b},0.40)`);
+        grad.addColorStop(0.72, `rgba(${r},${g},${b},1)`);
+        grad.addColorStop(1,    `rgba(${r},${g},${b},1)`);
+      }
+
+      ctx.fillStyle = grad;
+      ctx.fillRect(x, y, BAR_W, barH);
+    }
+  };
+
+  useEffect(() => {
+    if (!cardRef.current) return;
+    drawBars();
+    const ro = new ResizeObserver(drawBars);
+    ro.observe(cardRef.current);
+    return () => ro.disconnect();
+  }, [color]);
 
   return (
-    <div className="bg-white rounded-xl shadow-sm overflow-hidden">
-      <div className="px-2 pt-3 pb-2 flex justify-between items-start">
-        <div>
-          <h3 className="text-[11px] font-semibold text-gray-700">{title}</h3>
-          <p className="text-[9px] text-gray-400 mt-0.5">{subtitle}</p>
+    <div
+      ref={cardRef}
+      className="bg-white rounded-xl shadow-sm overflow-hidden flex-1 relative"
+      style={{ height: "clamp(110px, 18vw, 150px)", minWidth: 0 }}
+    >
+      {/* BARS canvas */}
+      <canvas
+        ref={canvasRef}
+        className="absolute bottom-0 left-0"
+        style={{ display: "block" }}
+      />
+
+      {/* CONTENT */}
+      <div className="absolute inset-0 flex items-start justify-between px-3 pt-3 pointer-events-none">
+        {/* Left: title + subtitle */}
+        <div className="flex flex-col justify-start min-w-0 flex-1 pr-2">
+          <p
+            className="font-semibold text-gray-700 truncate"
+            style={{ fontSize: "clamp(9px, 2.2vw, 11px)", lineHeight: "1.5" }}
+          >
+            {title}
+          </p>
+          <p
+            className="text-gray-400 truncate"
+            style={{ fontSize: "clamp(7px, 1.8vw, 9px)", lineHeight: "1.4", marginTop: "2px" }}
+          >
+            {subtitle}
+          </p>
         </div>
 
-        <h2 className="text-3xl font-bold text-gray-900 leading-none">
+        {/* Right: number */}
+        <div
+          className="font-bold text-gray-900 shrink-0"
+          style={{ fontSize: "clamp(18px, 4vw, 36px)", lineHeight: "1.2", textAlign: "right" }}
+        >
           {value}
-        </h2>
-      </div>
-
-      <div className="h-14 flex gap-[1px] items-end overflow-visible">
-        {safeBars.data.map((_, i) => (
-          <div
-            key={i}
-            className="w-[1px] shrink-0"
-            style={{
-              height: i === 0 ? "240%" : "100%",
-              backgroundImage:
-                i === 0
-                  ? `linear-gradient(to top,
-        ${hexToRgba(safeBars.solidColor, 0.01)} 0%,
-        ${hexToRgba(safeBars.solidColor, 0.03)} 8%,
-        ${hexToRgba(safeBars.solidColor, 0.08)} 14%,
-        ${hexToRgba(safeBars.solidColor, 0.2)} 18%,
-        ${safeBars.solidColor} 30%,
-        ${safeBars.solidColor} 100%)`
-                  : `linear-gradient(to top,
-        ${hexToRgba(safeBars.solidColor, 0.01)} 0%,
-        ${hexToRgba(safeBars.solidColor, 0.02)} 8%,
-        ${hexToRgba(safeBars.solidColor, 0.05)} 18%,
-        ${hexToRgba(safeBars.solidColor, 0.12)} 28%,
-        ${hexToRgba(safeBars.solidColor, 0.3)} 40%,
-        ${hexToRgba(safeBars.solidColor, 0.65)} 60%,
-        ${safeBars.solidColor} 100%)`,
-            }}
-          />
-        ))}
+        </div>
       </div>
     </div>
   );
 }
 
-// ✅ Badge (minor improvement)
 export function Badge({ status }) {
   const styles = {
     pending: "bg-orange-50 text-orange-500 border border-orange-200",
@@ -89,7 +142,7 @@ export function Badge({ status }) {
 
   return (
     <span
-      className={`inline-flex px-2.5 py-0.5 rounded-full text-xs font-medium ${
+      className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
         styles[status] || styles.pending
       }`}
     >
@@ -98,22 +151,20 @@ export function Badge({ status }) {
   );
 }
 
-// ✅ Modal (added click outside close)
 export function Modal({ title, onClose, children }) {
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 bg-black/25 flex items-center justify-center z-50"
+      className="fixed inset-0 bg-black/25 flex items-end sm:items-center justify-center z-50"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-2xl shadow-xl w-full max-w-md mx-4"
+        className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-md sm:mx-4 max-h-[90vh] flex flex-col"
       >
-        <div className="flex justify-between items-center px-5 pt-5 pb-1">
+        <div className="flex justify-between items-center px-5 pt-5 pb-1 flex-shrink-0">
           {title && (
             <h2 className="text-base font-bold text-gray-900">{title}</h2>
           )}
-
           <button
             onClick={onClose}
             className="ml-auto w-7 h-7 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 text-lg leading-none"
@@ -121,8 +172,7 @@ export function Modal({ title, onClose, children }) {
             ×
           </button>
         </div>
-
-        <div className="px-5 pb-5 pt-3">{children}</div>
+        <div className="px-5 pb-6 pt-3 overflow-y-auto">{children}</div>
       </div>
     </div>
   );
