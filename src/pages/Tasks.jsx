@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Plus } from "lucide-react";
@@ -27,14 +28,15 @@ export default function Tasks() {
   const users = useSelector((s) => s.tasks.users);
 
   const role = user?.role || "user";
+  const isAdmin = role === "admin";
 
   const [params, setParams] = useSearchParams();
 
-  const [sel, setSel] = useState(null);
+  const [viewTask, setViewTask] = useState(null);
   const [form, setForm] = useState(params.get("create") === "true");
   const [edit, setEdit] = useState(null);
   const [st, setSt] = useState(null);
-  const [del, setDel] = useState(false);
+  const [del, setDel] = useState(null);
 
   useEffect(() => {
     dispatch(fetchTasks());
@@ -45,10 +47,9 @@ export default function Tasks() {
     setForm(params.get("create") === "true");
   }, [params]);
 
-  const visible =
-    role === "admin"
-      ? tasks
-      : tasks.filter((t) => t.assignedTo === user?.email);
+  const visible = isAdmin
+    ? tasks
+    : tasks.filter((t) => t.assignedTo === user?.email);
 
   return (
     <>
@@ -56,15 +57,14 @@ export default function Tasks() {
         <div className="flex items-center justify-between gap-3 mb-5">
           <div>
             <h1 className="text-xl font-bold text-gray-900">
-              {role === "admin" ? "All Tasks" : "My Tasks"}
+              {isAdmin ? "All Tasks" : "My Tasks"}
             </h1>
-
             <p className="text-sm text-gray-400 mt-0.5">
               {visible.length} task{visible.length !== 1 ? "s" : ""} total
             </p>
           </div>
 
-          {role === "admin" && (
+          {isAdmin && (
             <button
               onClick={() => setForm(true)}
               className="flex items-center gap-2 rounded-xl bg-[#5b55d9] hover:bg-[#4e49c4] px-4 py-2.5 text-white text-sm font-semibold transition-colors shrink-0"
@@ -76,61 +76,59 @@ export default function Tasks() {
           )}
         </div>
 
-        <div
-          className={
-            sel
-              ? "grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_380px]"
-              : "grid grid-cols-1"
-          }
-        >
+        <div className={`grid gap-4 ${isAdmin && viewTask ? "grid-cols-[1fr_380px]" : "grid-cols-1"}`}>
           <div className="min-w-0">
             <TaskTable
               tasks={visible}
-              onView={setSel}
+              onView={setViewTask}
               onUpdate={setSt}
-              showUpdate={role !== "admin"}
+              showUpdate={!isAdmin}
             />
           </div>
 
-          {sel && (
-            <div className="hidden xl:block">
-              <TaskDetails
-                task={sel}
-                role={role}
-                onClose={() => setSel(null)}
-                onEdit={() => setEdit(sel)}
-                onDelete={() => setDel(true)}
-                onUpdate={() => setSt(sel)}
-              />
-            </div>
+          {/* ADMIN: sticky side panel */}
+          {isAdmin && viewTask && (
+            <TaskDetails
+              task={viewTask}
+              role={role}
+              onClose={() => setViewTask(null)}
+              onEdit={() => {
+                setEdit(viewTask);
+                setViewTask(null);
+              }}
+              onDelete={() => setDel(viewTask)}
+              onUpdate={() => {
+                setViewTask(null);
+                setSt(viewTask);
+              }}
+            />
           )}
         </div>
       </div>
 
-      {sel && (
-        <div className="fixed inset-0 z-50 flex items-end bg-black/40 xl:hidden">
-          <div className="max-h-[88dvh] w-full overflow-y-auto rounded-t-3xl bg-white p-4">
-            <div className="mx-auto mb-3 h-1 w-12 rounded-full bg-gray-300" />
-
+      {/* USER: view modal via portal */}
+      {!isAdmin && viewTask && createPortal(
+        <div
+          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 px-4"
+          onClick={(e) => { if (e.target === e.currentTarget) setViewTask(null); }}
+        >
+          <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl overflow-hidden">
             <TaskDetails
-              task={sel}
+              modal={true}
+              task={viewTask}
               role={role}
-              onClose={() => setSel(null)}
-              onEdit={() => {
-                setEdit(sel);
-                setSel(null);
-              }}
-              onDelete={() => setDel(true)}
+              onClose={() => setViewTask(null)}
               onUpdate={() => {
-                setSt(sel);
-                setSel(null);
+                setViewTask(null);
+                setSt(viewTask);
               }}
             />
           </div>
-        </div>
+        </div>,
+        document.body
       )}
 
-      {form && (
+      {form && createPortal(
         <TaskForm
           users={users}
           onClose={() => {
@@ -148,10 +146,11 @@ export default function Tasks() {
             setForm(false);
             setParams({});
           }}
-        />
+        />,
+        document.body
       )}
 
-      {edit && (
+      {edit && createPortal(
         <TaskForm
           task={edit}
           users={users}
@@ -160,10 +159,11 @@ export default function Tasks() {
             await dispatch(updateTask({ id: edit.id, changes: f }));
             setEdit(null);
           }}
-        />
+        />,
+        document.body
       )}
 
-      {st && (
+      {st && createPortal(
         <StatusModal
           task={st}
           role={role}
@@ -172,18 +172,20 @@ export default function Tasks() {
             await dispatch(updateTaskStatus({ id: st.id, status }));
             setSt(null);
           }}
-        />
+        />,
+        document.body
       )}
 
-      {del && (
+      {del && createPortal(
         <DeleteModal
-          onClose={() => setDel(false)}
+          onClose={() => setDel(null)}
           onDelete={async () => {
-            await dispatch(deleteTask(sel.id));
-            setDel(false);
-            setSel(null);
+            await dispatch(deleteTask(del.id));
+            setDel(null);
+            setViewTask(null);
           }}
-        />
+        />,
+        document.body
       )}
     </>
   );

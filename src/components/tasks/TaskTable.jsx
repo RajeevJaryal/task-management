@@ -1,10 +1,5 @@
 import { Badge } from "../common/Badge";
 
-/* ─────────────────────────────────────────────
-   TaskTable
-   Desktop  → full <table>
-   Mobile   → card list (NO horizontal scroll)
-───────────────────────────────────────────── */
 export function TaskTable({ tasks = [], onView, onUpdate, showUpdate }) {
   if (tasks.length === 0) {
     return (

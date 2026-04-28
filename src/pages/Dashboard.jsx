@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
@@ -6,6 +7,7 @@ import { StatCard, makeBarData } from "../components/UI";
 import { TaskTable, TaskDetails, StatusModal } from "../components/TasksUI";
 import { fetchTasks, updateTaskStatus } from "../store/taskSlice";
 import frame1 from "../assets/frame1.png";
+
 export default function Dashboard() {
   const dispatch = useDispatch();
   const { user } = useSelector((s) => s.auth);
@@ -28,8 +30,7 @@ export default function Dashboard() {
   const stats = [
     {
       title: role === "admin" ? "All Tasks" : "My Tasks",
-      subtitle:
-        role === "admin" ? "All tasks created so far" : "Assigned to you",
+      subtitle: role === "admin" ? "All tasks created so far" : "Assigned to you",
       value: myTasks.length,
       bars: makeBarData("#3b82f6"),
     },
@@ -56,7 +57,6 @@ export default function Dashboard() {
   return (
     <>
       <div className="pt-4 pb-2">
-        {/* Page title */}
         <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
         <p className="text-sm text-gray-400 mt-0.5">
           {role === "admin"
@@ -64,7 +64,6 @@ export default function Dashboard() {
             : "Your personal task overview"}
         </p>
 
-       
         <div className="mt-5 grid grid-cols-2 gap-3 xl:grid-cols-4">
           {stats.map((item) => (
             <StatCard key={item.title} {...item} />
@@ -85,7 +84,6 @@ export default function Dashboard() {
           </div>
         )}
 
-       
         {role === "admin" && (
           <div className="mt-4">
             <h2 className="mb-2 text-sm font-semibold text-gray-700">
@@ -93,54 +91,32 @@ export default function Dashboard() {
             </h2>
 
             <div className="flex flex-wrap gap-2">
-              {/* All Tasks */}
               <Link
                 to="/tasks"
                 className="group w-[300px] h-[82px] flex items-center rounded-[18px] border border-gray-200 bg-white px-4 transition-all hover:border-[#5b55d9] hover:shadow-sm"
               >
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 shrink-0 overflow-hidden">
-                    <img
-                      src={frame1}
-                      alt="All tasks"
-                      className="h-full w-full object-cover"
-                    />
+                    <img src={frame1} alt="All tasks" className="h-full w-full object-cover" />
                   </div>
-
                   <div>
-                    <h3 className="text-base font-bold text-gray-900 leading-none">
-                      All tasks
-                    </h3>
-
-                    <p className="mt-1 text-xs text-gray-400">
-                      View and manage tasks
-                    </p>
+                    <h3 className="text-base font-bold text-gray-900 leading-none">All tasks</h3>
+                    <p className="mt-1 text-xs text-gray-400">View and manage tasks</p>
                   </div>
                 </div>
               </Link>
 
-             
               <Link
                 to="/tasks?create=true"
                 className="group w-[300px] h-[82px] flex items-center rounded-[18px] border border-gray-200 bg-white px-4 transition-all hover:border-[#5b55d9] hover:shadow-sm"
               >
                 <div className="flex items-center gap-3">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-indigo-50 shrink-0 overflow-hidden">
-                    <img
-                      src={frame1}
-                      alt="Create Task"
-                      className="h-full w-full object-cover"
-                    />
+                    <img src={frame1} alt="Create Task" className="h-full w-full object-cover" />
                   </div>
-
                   <div>
-                    <h3 className="text-base font-bold text-gray-900 leading-none">
-                      Create Task
-                    </h3>
-
-                    <p className="mt-1 text-xs text-gray-400">
-                      Create new task
-                    </p>
+                    <h3 className="text-base font-bold text-gray-900 leading-none">Create Task</h3>
+                    <p className="mt-1 text-xs text-gray-400">Create new task</p>
                   </div>
                 </div>
               </Link>
@@ -149,16 +125,30 @@ export default function Dashboard() {
         )}
       </div>
 
-      {sel && (
-        <TaskDetails
-          task={sel}
-          role={role}
-          onClose={() => setSel(null)}
-          onUpdate={() => setSt(sel)}
-        />
+      {/* View modal */}
+      {sel && createPortal(
+        <div
+          className="fixed inset-0 z-[99999] flex items-center justify-center bg-black/50 px-4"
+          onClick={(e) => { if (e.target === e.currentTarget) setSel(null); }}
+        >
+          <div className="w-full max-w-sm rounded-2xl bg-white shadow-2xl overflow-hidden">
+            <TaskDetails
+              modal={true}
+              task={sel}
+              role={role}
+              onClose={() => setSel(null)}
+              onUpdate={() => {
+                setSel(null);
+                setSt(sel);
+              }}
+            />
+          </div>
+        </div>,
+        document.body
       )}
 
-      {st && (
+      {/* Status modal */}
+      {st && createPortal(
         <StatusModal
           task={st}
           role={role}
@@ -167,7 +157,8 @@ export default function Dashboard() {
             await dispatch(updateTaskStatus({ id: st.id, status }));
             setSt(null);
           }}
-        />
+        />,
+        document.body
       )}
     </>
   );
