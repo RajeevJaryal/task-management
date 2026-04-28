@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
+import { Plus } from "lucide-react";
 
 import { DashboardLayout } from "../components/Layout";
 import {
@@ -48,26 +49,37 @@ export default function Tasks() {
 
   return (
     <DashboardLayout role={role}>
-      <div className="pt-4">
-        <h1 className="text-base font-bold text-gray-900">Tasks</h1>
+      <div className="pt-4 pb-2">
+        {/* Header row */}
+        <div className="flex items-center justify-between gap-3 mb-5">
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">
+              {role === "admin" ? "All Tasks" : "My Tasks"}
+            </h1>
+            <p className="text-sm text-gray-400 mt-0.5">
+              {visible.length} task{visible.length !== 1 ? "s" : ""} total
+            </p>
+          </div>
 
-        {role === "admin" && (
-          <button
-            onClick={() => setForm(true)}
-            className="mt-4 rounded-lg bg-[#5b55d9] px-4 py-2 text-white"
-          >
-            + Create
-          </button>
-        )}
-
-        <div className="mt-4">
-          <TaskTable
-            tasks={visible}
-            onView={setSel}
-            onUpdate={setSt}
-            showUpdate={role !== "admin"}
-          />
+          {role === "admin" && (
+            <button
+              onClick={() => setForm(true)}
+              className="flex items-center gap-2 rounded-xl bg-[#5b55d9] hover:bg-[#4e49c4] px-4 py-2.5 text-white text-sm font-semibold transition-colors shrink-0"
+            >
+              <Plus size={16} />
+              <span className="hidden xs:inline">Create Task</span>
+              <span className="xs:hidden">New</span>
+            </button>
+          )}
         </div>
+
+        {/* Task table / cards */}
+        <TaskTable
+          tasks={visible}
+          onView={setSel}
+          onUpdate={setSt}
+          showUpdate={role !== "admin"}
+        />
       </div>
 
       {sel && (

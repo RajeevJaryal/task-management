@@ -1,4 +1,5 @@
 import React, { useEffect, useRef } from "react";
+import { X } from "lucide-react";
 
 export function makeBarData(solidColor) {
   return { solidColor };
@@ -50,7 +51,7 @@ export function StatCard({ title, subtitle, value, bars }) {
     for (let i = 0; i < count; i++) {
       const x = i * STEP;
       const isFirst = i === 0;
-      const barH = Math.round((isFirst ? physH : physH * 0.56));
+      const barH = Math.round(isFirst ? physH : physH * 0.56);
       const y = physH - barH;
 
       const grad = ctx.createLinearGradient(x, physH, x, y);
@@ -86,39 +87,27 @@ export function StatCard({ title, subtitle, value, bars }) {
   return (
     <div
       ref={cardRef}
-      className="bg-white rounded-xl shadow-sm overflow-hidden flex-1 relative"
-      style={{ height: "clamp(110px, 18vw, 150px)", minWidth: 0 }}
+      className="bg-white rounded-2xl shadow-sm overflow-hidden flex-1 relative"
+      style={{ height: "clamp(120px, 20vw, 160px)", minWidth: 0 }}
     >
-      {/* BARS canvas */}
+      {/* Bars canvas */}
       <canvas
         ref={canvasRef}
         className="absolute bottom-0 left-0"
         style={{ display: "block" }}
       />
 
-      {/* CONTENT */}
-      <div className="absolute inset-0 flex items-start justify-between px-3 pt-3 pointer-events-none">
-        {/* Left: title + subtitle */}
+      {/* Content */}
+      <div className="absolute inset-0 flex items-start justify-between px-4 pt-4 pointer-events-none">
         <div className="flex flex-col justify-start min-w-0 flex-1 pr-2">
-          <p
-            className="font-semibold text-gray-700 truncate"
-            style={{ fontSize: "clamp(9px, 2.2vw, 11px)", lineHeight: "1.5" }}
-          >
+          <p className="font-semibold text-gray-700 truncate text-sm leading-snug">
             {title}
           </p>
-          <p
-            className="text-gray-400 truncate"
-            style={{ fontSize: "clamp(7px, 1.8vw, 9px)", lineHeight: "1.4", marginTop: "2px" }}
-          >
+          <p className="text-gray-400 truncate text-xs mt-1 leading-snug">
             {subtitle}
           </p>
         </div>
-
-        {/* Right: number */}
-        <div
-          className="font-bold text-gray-900 shrink-0"
-          style={{ fontSize: "clamp(18px, 4vw, 36px)", lineHeight: "1.2", textAlign: "right" }}
-        >
+        <div className="font-bold text-gray-900 shrink-0 text-3xl sm:text-4xl leading-none">
           {value}
         </div>
       </div>
@@ -128,9 +117,9 @@ export function StatCard({ title, subtitle, value, bars }) {
 
 export function Badge({ status }) {
   const styles = {
-    pending: "bg-orange-50 text-orange-500 border border-orange-200",
+    pending:   "bg-orange-50 text-orange-500 border border-orange-200",
     completed: "bg-green-50 text-green-600 border border-green-200",
-    progress: "bg-blue-50 text-blue-500 border border-blue-200",
+    progress:  "bg-blue-50 text-blue-500 border border-blue-200",
   };
 
   const label =
@@ -142,7 +131,7 @@ export function Badge({ status }) {
 
   return (
     <span
-      className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium whitespace-nowrap ${
+      className={`inline-flex px-2.5 py-1 rounded-full text-xs font-semibold whitespace-nowrap ${
         styles[status] || styles.pending
       }`}
     >
@@ -151,28 +140,41 @@ export function Badge({ status }) {
   );
 }
 
+/* ─────────────────────────────────────────────
+   Modal
+   - Mobile: slides up from bottom (sheet)
+   - Desktop: centred dialog
+───────────────────────────────────────────── */
 export function Modal({ title, onClose, children }) {
   return (
     <div
       onClick={onClose}
-      className="fixed inset-0 bg-black/25 flex items-end sm:items-center justify-center z-50"
+      className="fixed inset-0 bg-black/30 flex items-end sm:items-center justify-center z-50"
     >
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-t-2xl sm:rounded-2xl shadow-xl w-full sm:max-w-md sm:mx-4 max-h-[90vh] flex flex-col"
+        className="bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl w-full sm:max-w-md sm:mx-4 max-h-[92dvh] flex flex-col"
       >
-        <div className="flex justify-between items-center px-5 pt-5 pb-1 flex-shrink-0">
+        {/* Drag handle (mobile only) */}
+        <div className="sm:hidden flex justify-center pt-3 pb-1 flex-shrink-0">
+          <div className="w-10 h-1 rounded-full bg-gray-200" />
+        </div>
+
+        {/* Header */}
+        <div className="flex justify-between items-center px-5 pt-4 sm:pt-5 pb-1 flex-shrink-0">
           {title && (
             <h2 className="text-base font-bold text-gray-900">{title}</h2>
           )}
           <button
             onClick={onClose}
-            className="ml-auto w-7 h-7 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600 text-lg leading-none"
+            className="ml-auto w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100 hover:text-gray-600"
           >
-            ×
+            <X size={16} />
           </button>
         </div>
-        <div className="px-5 pb-6 pt-3 overflow-y-auto">{children}</div>
+
+        {/* Body */}
+        <div className="px-5 pb-8 pt-3 overflow-y-auto">{children}</div>
       </div>
     </div>
   );
