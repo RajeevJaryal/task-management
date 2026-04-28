@@ -30,7 +30,7 @@ export function DashboardLayout({ children, role }) {
   return (
     <div className="min-h-screen flex bg-gray-50 lg:bg-white">
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-[260px] xl:w-[300px] border-r border-gray-200 bg-white flex-col justify-between z-30">
+      <aside className="hidden lg:flex fixed left-0 top-0 h-screen w-[230px] xl:w-[270px] border-r border-gray-200 bg-white flex-col justify-between z-30">
         <div>
           <div className="w-full h-16 flex items-center px-4 xl:px-[14px] border-b border-gray-100">
             <h1 className="font-bold text-gray-900 tracking-tight text-xl xl:text-2xl truncate">
