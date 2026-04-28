@@ -9,6 +9,7 @@
   html {
     -webkit-text-size-adjust: 100%;
     text-size-adjust: 100%;
+    overflow-x: hidden;
   }
   body {
     margin: 0;
@@ -16,26 +17,20 @@
     background-color: #f9fafb;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-  }
-  /* Prevent horizontal scroll site-wide */
-  body, #root {
+    /* Hard block on any horizontal scroll — ever */
     overflow-x: hidden;
     max-width: 100vw;
   }
-  /* Better tap targets on mobile */
+  #root {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+  /* Snappier tap on mobile */
   button, a, select, input, textarea {
     touch-action: manipulation;
   }
-  /* Smooth scrollbar */
+  /* Slim scrollbar */
   ::-webkit-scrollbar { width: 4px; height: 4px; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb { background: #e5e7eb; border-radius: 999px; }
-}
-
-@layer utilities {
-  /* xs breakpoint helper — 400px+ */
-  @media (min-width: 400px) {
-    .xs\:inline { display: inline; }
-    .xs\:hidden { display: none; }
-  }
 }

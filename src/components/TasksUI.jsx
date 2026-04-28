@@ -21,9 +21,9 @@ export function TaskTable({ tasks = [], onView, onUpdate, showUpdate }) {
       {/* ── DESKTOP TABLE (md+) ── */}
       <div className="hidden md:block border border-gray-100 rounded-xl overflow-hidden bg-white">
         <div className="overflow-x-auto">
-          <table className="w-full text-sm min-w-[600px]">
+          <table className="w-full text-xs min-w-[600px]">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50/60">
+              <tr className="border-b border-gray-100">
                 {[
                   "Task ID",
                   "Task Title",
@@ -34,34 +34,34 @@ export function TaskTable({ tasks = [], onView, onUpdate, showUpdate }) {
                 ].map((h) => (
                   <th
                     key={h}
-                    className="px-5 py-3.5 text-left text-gray-500 font-semibold text-xs uppercase tracking-wide whitespace-nowrap"
+                    className="px-4 py-3 text-left text-gray-400 font-medium text-[11px] uppercase tracking-wide whitespace-nowrap"
                   >
                     {h}
                   </th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody>
               {tasks.map((t) => (
                 <tr
                   key={t.id}
-                  className="hover:bg-gray-50/50 transition-colors"
+                  className="border-t border-gray-50 hover:bg-gray-50/50 transition-colors"
                 >
-                  <td className="px-5 py-4 font-semibold text-gray-700 whitespace-nowrap text-sm">
+                  <td className="px-4 py-3.5 font-semibold text-gray-800 whitespace-nowrap">
                     {t.taskCode || `#${t.id?.slice(0, 6)}`}
                   </td>
-                  <td className="px-5 py-4 font-semibold text-gray-900 max-w-[200px] truncate text-sm">
+                  <td className="px-4 py-3.5 font-semibold text-gray-800 max-w-[180px] truncate">
                     {t.title || "Untitled"}
                   </td>
-                  <td className="px-5 py-4 text-gray-500 max-w-[160px] truncate text-sm">
+                  <td className="px-4 py-3.5 text-gray-600 max-w-[140px] truncate">
                     {showUpdate
                       ? t.assignedByName || t.assignedBy || "Admin"
                       : t.assignedToName || t.assignedTo || "Not assigned"}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3.5">
                     <Badge status={t.status || "pending"} />
                   </td>
-                  <td className="px-5 py-4 text-gray-400 whitespace-nowrap text-sm">
+                  <td className="px-4 py-3.5 text-gray-500 whitespace-nowrap">
                     {t.createdAt
                       ? new Date(t.createdAt).toLocaleDateString("en-GB", {
                           day: "2-digit",
@@ -70,18 +70,18 @@ export function TaskTable({ tasks = [], onView, onUpdate, showUpdate }) {
                         })
                       : "N/A"}
                   </td>
-                  <td className="px-5 py-4">
+                  <td className="px-4 py-3.5">
                     <div className="flex gap-2 flex-nowrap">
                       <button
                         onClick={() => onView?.(t)}
-                        className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-colors font-medium text-sm whitespace-nowrap"
+                        className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 transition-colors font-medium whitespace-nowrap"
                       >
                         View
                       </button>
                       {showUpdate && (
                         <button
                           onClick={() => onUpdate?.(t)}
-                          className="px-4 py-2 bg-[#5b55d9] hover:bg-[#4e49c4] text-white rounded-lg transition-colors font-medium text-sm whitespace-nowrap"
+                          className="px-3 py-1.5 bg-[#5b55d9] hover:bg-[#4e49c4] text-white rounded-lg transition-colors font-medium whitespace-nowrap"
                         >
                           Update
                         </button>
@@ -95,34 +95,34 @@ export function TaskTable({ tasks = [], onView, onUpdate, showUpdate }) {
         </div>
       </div>
 
-      {/* ── MOBILE CARD LIST (< md) — zero horizontal scroll ── */}
-      <div className="md:hidden space-y-3">
+      {/* ── MOBILE CARD LIST (<md) ── */}
+      <div className="md:hidden space-y-2">
         {tasks.map((t) => (
           <div
             key={t.id}
-            className="bg-white border border-gray-100 rounded-2xl p-4 shadow-sm"
+            className="bg-white border border-gray-100 rounded-xl p-4"
           >
-            {/* Row 1: ID + Badge */}
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-xs font-semibold text-gray-400 tracking-wide">
+            {/* Row 1: ID + badge */}
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-[11px] font-semibold text-gray-400">
                 {t.taskCode || `#${t.id?.slice(0, 6)}`}
               </span>
               <Badge status={t.status || "pending"} />
             </div>
 
             {/* Row 2: Title */}
-            <p className="text-base font-bold text-gray-900 mb-2 leading-snug">
+            <p className="text-sm font-semibold text-gray-900 mb-1 leading-snug">
               {t.title || "Untitled"}
             </p>
 
-            {/* Row 3: Assigned + Date */}
-            <div className="flex items-center justify-between mb-4">
-              <span className="text-sm text-gray-500 truncate max-w-[60%]">
+            {/* Row 3: Assigned + date */}
+            <div className="flex items-center justify-between text-xs text-gray-400 mb-3">
+              <span className="truncate max-w-[55%]">
                 {showUpdate
                   ? `By: ${t.assignedByName || t.assignedBy || "Admin"}`
                   : `To: ${t.assignedToName || t.assignedTo || "Not assigned"}`}
               </span>
-              <span className="text-sm text-gray-400 shrink-0 ml-2">
+              <span className="shrink-0 ml-2">
                 {t.createdAt
                   ? new Date(t.createdAt).toLocaleDateString("en-GB", {
                       day: "2-digit",
@@ -133,20 +133,20 @@ export function TaskTable({ tasks = [], onView, onUpdate, showUpdate }) {
               </span>
             </div>
 
-            {/* Row 4: Action Buttons — full width, easy tap targets */}
+            {/* Row 4: Actions */}
             <div className="flex gap-2">
               <button
                 onClick={() => onView?.(t)}
-                className="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 rounded-xl text-gray-700 text-sm font-semibold transition-colors flex items-center justify-center gap-1.5"
+                className="flex-1 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg text-gray-700 text-xs font-medium transition-colors"
               >
-                <Eye size={15} /> View
+                View
               </button>
               {showUpdate && (
                 <button
                   onClick={() => onUpdate?.(t)}
-                  className="flex-1 py-2.5 bg-[#5b55d9] hover:bg-[#4e49c4] text-white rounded-xl text-sm font-semibold transition-colors flex items-center justify-center gap-1.5"
+                  className="flex-1 py-2 bg-[#5b55d9] hover:bg-[#4e49c4] text-white rounded-lg text-xs font-medium transition-colors"
                 >
-                  <RefreshCw size={15} /> Update
+                  Update Status
                 </button>
               )}
             </div>
@@ -158,8 +158,7 @@ export function TaskTable({ tasks = [], onView, onUpdate, showUpdate }) {
 }
 
 /* ─────────────────────────────────────────────
-   TaskDetails — slides up as bottom sheet on mobile,
-   sticky sidebar on desktop
+   TaskDetails
 ───────────────────────────────────────────── */
 export function TaskDetails({ task, role, onClose, onEdit, onDelete, onUpdate }) {
   if (!task) return null;
@@ -171,180 +170,141 @@ export function TaskDetails({ task, role, onClose, onEdit, onDelete, onUpdate })
   };
 
   return (
-    <>
-      {/* Mobile: full-screen bottom sheet */}
-      <div className="lg:hidden fixed inset-0 z-50 flex flex-col justify-end">
-        {/* Backdrop */}
-        <div
-          className="absolute inset-0 bg-black/40"
+    <aside
+      className="bg-white border border-gray-100 rounded-xl flex flex-col w-full"
+      style={{ maxHeight: "calc(100vh - 120px)", position: "sticky", top: "80px" }}
+    >
+      {/* Sticky Header */}
+      <div className="flex justify-between items-center px-5 pt-5 pb-3 border-b border-gray-100 flex-shrink-0">
+        <h2 className="text-sm font-bold text-gray-900">Task Details</h2>
+        <button
           onClick={onClose}
-        />
-        {/* Sheet */}
-        <div className="relative bg-white rounded-t-3xl w-full max-h-[92dvh] flex flex-col shadow-2xl">
-          {/* Drag handle */}
-          <div className="flex justify-center pt-3 pb-1 flex-shrink-0">
-            <div className="w-10 h-1 rounded-full bg-gray-200" />
+          className="w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"
+        >
+          <X size={14} />
+        </button>
+      </div>
+
+      {/* Scrollable Body */}
+      <div
+        className="flex-1 overflow-y-auto px-5 py-4 space-y-4"
+        style={{ scrollbarWidth: "thin", scrollbarColor: "#e5e7eb transparent" }}
+      >
+        <div
+          className={`${
+            statusBg[task.status] || "bg-orange-50"
+          } rounded-lg p-3 flex justify-between items-center gap-3`}
+        >
+          <div className="min-w-0">
+            <p className="text-[10px] text-gray-400 mb-1">Status</p>
+            <Badge status={task.status || "pending"} />
           </div>
-          {/* Header */}
-          <div className="flex justify-between items-center px-5 pt-2 pb-3 border-b border-gray-100 flex-shrink-0">
-            <h2 className="text-base font-bold text-gray-900">Task Details</h2>
+          <button
+            onClick={onUpdate}
+            className="text-xs border border-gray-200 bg-white rounded-lg px-3 py-1.5 text-gray-600 hover:bg-gray-50 transition-colors shrink-0"
+          >
+            Update status
+          </button>
+        </div>
+
+        <div className="space-y-4 text-sm">
+          <div>
+            <p className="text-[10px] text-gray-400 mb-0.5">Task Title</p>
+            <p className="font-semibold text-gray-900 break-words">{task.title || "Untitled"}</p>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div className="min-w-0">
+              <p className="text-[10px] text-gray-400 mb-0.5">
+                {role === "admin" ? "Assigned To" : "Assigned By"}
+              </p>
+              <p className="font-semibold text-gray-900 text-xs truncate">
+                {role === "admin"
+                  ? task.assignedToName || task.assignedTo || "Not assigned"
+                  : task.assignedByName || task.assignedBy || "Admin"}
+              </p>
+            </div>
+            <div className="min-w-0">
+              <p className="text-[10px] text-gray-400 mb-0.5">Task ID</p>
+              <p className="font-semibold text-gray-900 text-xs truncate">
+                {task.taskCode || `#${task.id?.slice(0, 6)}`}
+              </p>
+            </div>
+          </div>
+
+          <div>
+            <p className="text-[10px] text-gray-400 mb-0.5">Description</p>
+            <p className="text-gray-600 text-xs leading-relaxed break-words">
+              {task.description || "No description provided for this task."}
+            </p>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-100 pt-4">
+          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide mb-3">
+            Activity History
+          </p>
+          {(task.history || []).length === 0 ? (
+            <p className="text-xs text-gray-400">No activity yet.</p>
+          ) : (
+            <div className="space-y-3">
+              {(task.history || []).map((h, i) => (
+                <div className="flex gap-3" key={i}>
+                  <div className="flex flex-col items-center flex-shrink-0">
+                    <div
+                      className={`w-2.5 h-2.5 rounded-full ${
+                        i === 0 ? "bg-gray-900" : "border-2 border-gray-300 bg-white"
+                      }`}
+                    />
+                    {i < (task.history || []).length - 1 && (
+                      <div
+                        className="w-px flex-1 bg-gray-100 mt-1"
+                        style={{ minHeight: "16px" }}
+                      />
+                    )}
+                  </div>
+                  <div className="pb-2 min-w-0">
+                    <p className="text-xs font-medium text-gray-700 break-words">{h.text}</p>
+                    <p className="text-[10px] text-gray-400 mt-0.5">
+                      {h.date ? new Date(h.date).toLocaleString() : ""}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Sticky Footer */}
+      {role === "admin" ? (
+        <div className="px-5 py-4 border-t border-gray-100 flex-shrink-0 bg-white rounded-b-xl">
+          <div className="grid grid-cols-2 gap-3">
             <button
-              onClick={onClose}
-              className="w-8 h-8 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"
+              onClick={onDelete}
+              className="py-2.5 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors font-medium"
             >
-              <X size={16} />
+              Delete
+            </button>
+            <button
+              onClick={onEdit}
+              className="py-2.5 text-sm text-white bg-[#5b55d9] hover:bg-[#4e49c4] rounded-lg transition-colors font-medium"
+            >
+              Edit Task
             </button>
           </div>
-          {/* Scrollable Body */}
-          <div className="flex-1 overflow-y-auto px-5 py-4 space-y-4">
-            <TaskDetailsBody task={task} role={role} onUpdate={onUpdate} statusBg={statusBg} />
-          </div>
-          {/* Footer */}
-          <TaskDetailsFooter role={role} onDelete={onDelete} onEdit={onEdit} onUpdate={onUpdate} />
-        </div>
-      </div>
-
-      {/* Desktop: sticky sidebar */}
-      <aside
-        className="hidden lg:flex bg-white border border-gray-100 rounded-xl flex-col w-full"
-        style={{ maxHeight: "calc(100vh - 120px)", position: "sticky", top: "80px" }}
-      >
-        <div className="flex justify-between items-center px-5 pt-5 pb-3 border-b border-gray-100 flex-shrink-0">
-          <h2 className="text-sm font-bold text-gray-900">Task Details</h2>
-          <button
-            onClick={onClose}
-            className="w-6 h-6 flex items-center justify-center rounded-full text-gray-400 hover:bg-gray-100"
-          >
-            <X size={14} />
-          </button>
-        </div>
-        <div
-          className="flex-1 overflow-y-auto px-5 py-4 space-y-4"
-          style={{ scrollbarWidth: "thin", scrollbarColor: "#e5e7eb transparent" }}
-        >
-          <TaskDetailsBody task={task} role={role} onUpdate={onUpdate} statusBg={statusBg} />
-        </div>
-        <TaskDetailsFooter role={role} onDelete={onDelete} onEdit={onEdit} onUpdate={onUpdate} />
-      </aside>
-    </>
-  );
-}
-
-function TaskDetailsBody({ task, role, onUpdate, statusBg }) {
-  return (
-    <>
-      <div
-        className={`${statusBg[task.status] || "bg-orange-50"} rounded-xl p-4 flex justify-between items-center gap-3`}
-      >
-        <div className="min-w-0">
-          <p className="text-xs text-gray-400 mb-1">Status</p>
-          <Badge status={task.status || "pending"} />
-        </div>
-        <button
-          onClick={onUpdate}
-          className="text-sm border border-gray-200 bg-white rounded-lg px-4 py-2 text-gray-600 hover:bg-gray-50 transition-colors shrink-0 font-medium"
-        >
-          Update status
-        </button>
-      </div>
-
-      <div className="space-y-4">
-        <div>
-          <p className="text-xs text-gray-400 mb-1">Task Title</p>
-          <p className="font-bold text-gray-900 text-base break-words leading-snug">
-            {task.title || "Untitled"}
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-3">
-          <div className="min-w-0">
-            <p className="text-xs text-gray-400 mb-1">
-              {role === "admin" ? "Assigned To" : "Assigned By"}
-            </p>
-            <p className="font-semibold text-gray-900 text-sm break-words">
-              {role === "admin"
-                ? task.assignedToName || task.assignedTo || "Not assigned"
-                : task.assignedByName || task.assignedBy || "Admin"}
-            </p>
-          </div>
-          <div className="min-w-0">
-            <p className="text-xs text-gray-400 mb-1">Task ID</p>
-            <p className="font-semibold text-gray-900 text-sm break-all">
-              {task.taskCode || `#${task.id?.slice(0, 6)}`}
-            </p>
-          </div>
-        </div>
-
-        <div>
-          <p className="text-xs text-gray-400 mb-1">Description</p>
-          <p className="text-gray-600 text-sm leading-relaxed break-words">
-            {task.description || "No description provided for this task."}
-          </p>
-        </div>
-      </div>
-
-      <div className="border-t border-gray-100 pt-4">
-        <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
-          Activity History
-        </p>
-        {(task.history || []).length === 0 ? (
-          <p className="text-sm text-gray-400">No activity yet.</p>
-        ) : (
-          <div className="space-y-3">
-            {(task.history || []).map((h, i) => (
-              <div className="flex gap-3" key={i}>
-                <div className="flex flex-col items-center flex-shrink-0">
-                  <div
-                    className={`w-2.5 h-2.5 rounded-full ${
-                      i === 0 ? "bg-gray-900" : "border-2 border-gray-300 bg-white"
-                    }`}
-                  />
-                  {i < (task.history || []).length - 1 && (
-                    <div className="w-px flex-1 bg-gray-100 mt-1" style={{ minHeight: "16px" }} />
-                  )}
-                </div>
-                <div className="pb-2 min-w-0">
-                  <p className="text-sm font-medium text-gray-700 break-words">{h.text}</p>
-                  <p className="text-xs text-gray-400 mt-0.5">
-                    {h.date ? new Date(h.date).toLocaleString() : ""}
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
-    </>
-  );
-}
-
-function TaskDetailsFooter({ role, onDelete, onEdit, onUpdate }) {
-  return (
-    <div className="px-5 py-4 border-t border-gray-100 flex-shrink-0 bg-white rounded-b-xl">
-      {role === "admin" ? (
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            onClick={onDelete}
-            className="py-3 text-sm text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors font-semibold flex items-center justify-center gap-2"
-          >
-            <Trash2 size={15} /> Delete
-          </button>
-          <button
-            onClick={onEdit}
-            className="py-3 text-sm text-white bg-[#5b55d9] hover:bg-[#4e49c4] rounded-xl transition-colors font-semibold flex items-center justify-center gap-2"
-          >
-            <Edit2 size={15} /> Edit Task
-          </button>
         </div>
       ) : (
-        <button
-          onClick={onUpdate}
-          className="w-full py-3 text-sm text-white bg-[#5b55d9] hover:bg-[#4e49c4] rounded-xl transition-colors font-semibold"
-        >
-          Update Task
-        </button>
+        <div className="px-5 py-4 border-t border-gray-100 flex-shrink-0 bg-white rounded-b-xl">
+          <button
+            onClick={onUpdate}
+            className="w-full py-2.5 text-sm text-white bg-[#5b55d9] hover:bg-[#4e49c4] rounded-lg transition-colors font-medium"
+          >
+            Update Task
+          </button>
+        </div>
       )}
-    </div>
+    </aside>
   );
 }
 
@@ -377,26 +337,26 @@ export function TaskForm({ task, users = [], onClose, onSubmit }) {
           onSubmit(f);
         }}
       >
-        <label className="text-sm font-semibold text-gray-700">Task title</label>
+        <label className="text-xs font-semibold text-gray-700">Task title</label>
         <input
-          className="w-full border border-gray-200 rounded-xl px-4 py-3 mt-1.5 mb-4 text-sm outline-none focus:border-[#5b55d9] placeholder:text-gray-300"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 mt-1.5 mb-4 text-sm outline-none focus:border-[#5b55d9] placeholder:text-gray-300"
           placeholder="Enter the task title"
           value={f.title}
           onChange={(e) => setF({ ...f, title: e.target.value })}
           required
         />
 
-        <label className="text-sm font-semibold text-gray-700">Description</label>
+        <label className="text-xs font-semibold text-gray-700">Description</label>
         <textarea
-          className="w-full border border-gray-200 rounded-xl px-4 py-3 mt-1.5 mb-4 min-h-[90px] text-sm outline-none focus:border-[#5b55d9] resize-none placeholder:text-gray-300"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 mt-1.5 mb-4 min-h-[80px] text-sm outline-none focus:border-[#5b55d9] resize-none placeholder:text-gray-300"
           placeholder="Briefly describe what needs to be done"
           value={f.description}
           onChange={(e) => setF({ ...f, description: e.target.value })}
         />
 
-        <label className="text-sm font-semibold text-gray-700">Assign to</label>
+        <label className="text-xs font-semibold text-gray-700">Assign to</label>
         <select
-          className="w-full border border-gray-200 rounded-xl px-4 py-3 mt-1.5 mb-5 text-sm outline-none focus:border-[#5b55d9] text-gray-700"
+          className="w-full border border-gray-200 rounded-lg px-3 py-2.5 mt-1.5 mb-5 text-sm outline-none focus:border-[#5b55d9] text-gray-700"
           value={f.assignedTo}
           onChange={(e) => handleUserChange(e.target.value)}
           required
@@ -410,7 +370,7 @@ export function TaskForm({ task, users = [], onClose, onSubmit }) {
         </select>
 
         {users.length === 0 && (
-          <p className="text-sm text-red-500 -mt-3 mb-4">
+          <p className="text-xs text-red-500 -mt-3 mb-4">
             No users found. Create a user account with role "user" first.
           </p>
         )}
@@ -419,13 +379,13 @@ export function TaskForm({ task, users = [], onClose, onSubmit }) {
           <button
             type="button"
             onClick={onClose}
-            className="py-3 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors font-semibold"
+            className="py-2.5 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
           >
             Cancel
           </button>
           <button
             type="submit"
-            className="py-3 text-sm bg-[#5b55d9] hover:bg-[#4e49c4] text-white rounded-xl transition-colors font-semibold"
+            className="py-2.5 text-sm bg-[#5b55d9] hover:bg-[#4e49c4] text-white rounded-lg transition-colors"
           >
             {task ? "Save Changes" : "Create Task"}
           </button>
@@ -450,43 +410,43 @@ export function StatusModal({ task, role, onClose, onSubmit }) {
   };
 
   return (
-    <Modal title="Update Status" onClose={onClose}>
+    <Modal title="Task Status" onClose={onClose}>
       <div
-        className={`${statusBg[task.status] || "bg-orange-50"} rounded-xl p-4 flex justify-between items-center mb-4`}
+        className={`${
+          statusBg[task.status] || "bg-orange-50"
+        } rounded-lg p-3 flex justify-between items-center mb-4`}
       >
-        <p className="text-sm text-gray-500 font-medium">Current Status</p>
+        <p className="text-xs text-gray-500">Status</p>
         <Badge status={task.status || "pending"} />
       </div>
 
       <div className="mb-4">
-        <p className="text-xs text-gray-400 mb-1">Task Title</p>
-        <p className="text-base font-bold text-gray-900 break-words leading-snug">
-          {task.title || "Untitled"}
-        </p>
+        <p className="text-[10px] text-gray-400 mb-0.5">Task Title</p>
+        <p className="text-sm font-semibold text-gray-900 break-words">{task.title || "Untitled"}</p>
       </div>
 
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="min-w-0">
-          <p className="text-xs text-gray-400 mb-1">
+          <p className="text-[10px] text-gray-400 mb-0.5">
             {role === "admin" ? "Assigned To" : "Assigned By"}
           </p>
-          <p className="text-sm font-semibold text-gray-900 break-words">
+          <p className="text-sm font-semibold text-gray-900 truncate">
             {role === "admin"
               ? task.assignedToName || task.assignedTo || "Not assigned"
               : task.assignedByName || task.assignedBy || "Admin"}
           </p>
         </div>
         <div className="min-w-0">
-          <p className="text-xs text-gray-400 mb-1">Task ID</p>
-          <p className="text-sm font-semibold text-gray-900 break-all">
+          <p className="text-[10px] text-gray-400 mb-0.5">Task ID</p>
+          <p className="text-sm font-semibold text-gray-900 truncate">
             {task.taskCode || `#${task.id?.slice(0, 6)}`}
           </p>
         </div>
       </div>
 
-      <label className="text-sm font-semibold text-gray-700">Update status</label>
+      <label className="text-xs font-semibold text-gray-700">Update status</label>
       <select
-        className="w-full border border-gray-200 rounded-xl px-4 py-3 mt-1.5 text-sm outline-none focus:border-[#5b55d9]"
+        className="w-full border border-gray-200 rounded-lg px-3 py-2.5 mt-1.5 text-sm outline-none focus:border-[#5b55d9]"
         value={s}
         onChange={(e) => setS(e.target.value)}
       >
@@ -495,20 +455,20 @@ export function StatusModal({ task, role, onClose, onSubmit }) {
         <option value="completed">Completed</option>
       </select>
 
-      <p className="text-xs text-gray-400 mt-2 mb-5">
+      <p className="text-[10px] text-gray-400 mt-1.5 mb-5">
         Changing the status will update it for the assigned user.
       </p>
 
       <div className="grid grid-cols-2 gap-3">
         <button
           onClick={onClose}
-          className="py-3 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors font-semibold"
+          className="py-2.5 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
         >
           Cancel
         </button>
         <button
           onClick={() => onSubmit(s)}
-          className="py-3 text-sm bg-[#5b55d9] hover:bg-[#4e49c4] text-white rounded-xl transition-colors font-semibold"
+          className="py-2.5 text-sm bg-[#5b55d9] hover:bg-[#4e49c4] text-white rounded-lg transition-colors"
         >
           Save Changes
         </button>
@@ -524,23 +484,20 @@ export function DeleteModal({ onClose, onDelete }) {
   return (
     <Modal title="" onClose={onClose}>
       <div className="text-center pt-2">
-        <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-4">
-          <Trash2 size={24} className="text-red-500" />
-        </div>
-        <h2 className="font-bold text-xl text-gray-900 mb-2">Delete this task?</h2>
-        <p className="text-sm text-gray-400 mb-6 leading-relaxed">
+        <h2 className="font-bold text-lg text-gray-900 mb-2">Delete this task?</h2>
+        <p className="text-sm text-gray-400 mb-6">
           This action cannot be undone. The task will be permanently removed.
         </p>
         <div className="grid grid-cols-2 gap-3">
           <button
             onClick={onClose}
-            className="py-3 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl transition-colors font-semibold"
+            className="py-2.5 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors"
           >
             Cancel
           </button>
           <button
             onClick={onDelete}
-            className="py-3 text-sm bg-red-500 hover:bg-red-600 text-white rounded-xl transition-colors font-semibold"
+            className="py-2.5 text-sm bg-red-500 hover:bg-red-600 text-white rounded-lg transition-colors"
           >
             Delete Task
           </button>

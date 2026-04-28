@@ -42,6 +42,10 @@ export default function Tasks() {
     dispatch(fetchUsers());
   }, [dispatch]);
 
+  useEffect(() => {
+    setForm(params.get("create") === "true");
+  }, [params]);
+
   const visible =
     role === "admin"
       ? tasks
@@ -50,12 +54,12 @@ export default function Tasks() {
   return (
     <DashboardLayout role={role}>
       <div className="pt-4 pb-2">
-        {/* Header row */}
         <div className="flex items-center justify-between gap-3 mb-5">
           <div>
             <h1 className="text-xl font-bold text-gray-900">
               {role === "admin" ? "All Tasks" : "My Tasks"}
             </h1>
+
             <p className="text-sm text-gray-400 mt-0.5">
               {visible.length} task{visible.length !== 1 ? "s" : ""} total
             </p>
@@ -73,24 +77,58 @@ export default function Tasks() {
           )}
         </div>
 
-        {/* Task table / cards */}
-        <TaskTable
-          tasks={visible}
-          onView={setSel}
-          onUpdate={setSt}
-          showUpdate={role !== "admin"}
-        />
+        <div
+          className={
+            sel
+              ? "grid grid-cols-1 gap-5 xl:grid-cols-[minmax(0,1fr)_380px]"
+              : "grid grid-cols-1"
+          }
+        >
+          <div className="min-w-0">
+            <TaskTable
+              tasks={visible}
+              onView={setSel}
+              onUpdate={setSt}
+              showUpdate={role !== "admin"}
+            />
+          </div>
+
+          {sel && (
+            <div className="hidden xl:block">
+              <TaskDetails
+                task={sel}
+                role={role}
+                onClose={() => setSel(null)}
+                onEdit={() => setEdit(sel)}
+                onDelete={() => setDel(true)}
+                onUpdate={() => setSt(sel)}
+              />
+            </div>
+          )}
+        </div>
       </div>
 
       {sel && (
-        <TaskDetails
-          task={sel}
-          role={role}
-          onClose={() => setSel(null)}
-          onEdit={() => setEdit(sel)}
-          onDelete={() => setDel(true)}
-          onUpdate={() => setSt(sel)}
-        />
+        <div className="fixed inset-0 z-50 flex items-end bg-black/40 xl:hidden">
+          <div className="max-h-[88dvh] w-full overflow-y-auto rounded-t-3xl bg-white p-4">
+            <div className="mx-auto mb-3 h-1 w-12 rounded-full bg-gray-300" />
+
+            <TaskDetails
+              task={sel}
+              role={role}
+              onClose={() => setSel(null)}
+              onEdit={() => {
+                setEdit(sel);
+                setSel(null);
+              }}
+              onDelete={() => setDel(true)}
+              onUpdate={() => {
+                setSt(sel);
+                setSel(null);
+              }}
+            />
+          </div>
+        </div>
       )}
 
       {form && (
@@ -109,6 +147,7 @@ export default function Tasks() {
               })
             );
             setForm(false);
+            setParams({});
           }}
         />
       )}

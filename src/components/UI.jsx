@@ -100,10 +100,10 @@ export function StatCard({ title, subtitle, value, bars }) {
       {/* Content */}
       <div className="absolute inset-0 flex items-start justify-between px-4 pt-4 pointer-events-none">
         <div className="flex flex-col justify-start min-w-0 flex-1 pr-2">
-          <p className="font-semibold text-gray-700 truncate text-sm leading-snug">
+          <p className="font-semibold text-gray-700 truncate text-[13px] leading-snug">
             {title}
           </p>
-          <p className="text-gray-400 truncate text-xs mt-1 leading-snug">
+          <p className="text-gray-400 truncate text-[11px] mt-1 leading-snug">
             {subtitle}
           </p>
         </div>
