@@ -1,7 +1,7 @@
 import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
 
-export default function ProtectedRoute({ requireRole = false }) {
+export default function PublicRoute() {
   const { user, initialized } = useSelector((s) => s.auth);
 
   if (!initialized) {
@@ -12,8 +12,9 @@ export default function ProtectedRoute({ requireRole = false }) {
     );
   }
 
-  if (!user) return <Navigate to="/login" replace />;
-  if (requireRole && !user.role) return <Navigate to="/choose-role" replace />;
+  if (user) {
+    return <Navigate to={user.role ? "/dashboard" : "/choose-role"} replace />;
+  }
 
   return <Outlet />;
 }

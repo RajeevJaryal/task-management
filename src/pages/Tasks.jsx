@@ -3,7 +3,6 @@ import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Plus } from "lucide-react";
 
-import { DashboardLayout } from "../components/Layout";
 import {
   TaskTable,
   TaskDetails,
@@ -52,7 +51,7 @@ export default function Tasks() {
       : tasks.filter((t) => t.assignedTo === user?.email);
 
   return (
-    <DashboardLayout role={role}>
+    <>
       <div className="pt-4 pb-2">
         <div className="flex items-center justify-between gap-3 mb-5">
           <div>
@@ -186,6 +185,6 @@ export default function Tasks() {
           }}
         />
       )}
-    </DashboardLayout>
+    </>
   );
 }

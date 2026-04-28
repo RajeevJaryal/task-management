@@ -1,6 +1,6 @@
 import { useEffect } from "react";
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import { useDispatch } from "react-redux";
 
 import { loadCurrentUser } from "./store/authSlice";
 
@@ -10,25 +10,9 @@ import ChooseRole from "./pages/ChooseRole";
 import Dashboard from "./pages/Dashboard";
 import Tasks from "./pages/Tasks";
 
+import PublicRoute from "./routes/PublicRoute";
 import ProtectedRoute from "./routes/ProtectedRoute";
-
-function PublicRoute({ children }) {
-  const { user, initialized } = useSelector((s) => s.auth);
-
-  if (!initialized) {
-    return (
-      <div className="grid min-h-dvh place-items-center text-sm text-gray-400">
-        Loading...
-      </div>
-    );
-  }
-
-  if (user) {
-    return <Navigate to={user.role ? "/dashboard" : "/choose-role"} replace />;
-  }
-
-  return children;
-}
+import { DashboardLayout } from "./components/Layout";
 
 export default function App() {
   const dispatch = useDispatch();
@@ -42,50 +26,21 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/login" replace />} />
 
-        <Route
-          path="/login"
-          element={
-            <PublicRoute>
-              <Login />
-            </PublicRoute>
-          }
-        />
+        <Route element={<PublicRoute />}>
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
+        </Route>
 
-        <Route
-          path="/signup"
-          element={
-            <PublicRoute>
-              <Signup />
-            </PublicRoute>
-          }
-        />
+        <Route element={<ProtectedRoute />}>
+          <Route path="/choose-role" element={<ChooseRole />} />
+        </Route>
 
-        <Route
-          path="/choose-role"
-          element={
-            <ProtectedRoute>
-              <ChooseRole />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute role>
-              <Dashboard />
-            </ProtectedRoute>
-          }
-        />
-
-        <Route
-          path="/tasks"
-          element={
-            <ProtectedRoute role>
-              <Tasks />
-            </ProtectedRoute>
-          }
-        />
+        <Route element={<ProtectedRoute requireRole />}>
+          <Route element={<DashboardLayout />}>
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/tasks" element={<Tasks />} />
+          </Route>
+        </Route>
       </Routes>
     </BrowserRouter>
   );

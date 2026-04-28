@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
-import { DashboardLayout } from "../components/Layout";
 import { StatCard, makeBarData } from "../components/UI";
 import { TaskTable, TaskDetails, StatusModal } from "../components/TasksUI";
 import { fetchTasks, updateTaskStatus } from "../store/taskSlice";
@@ -55,7 +54,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <DashboardLayout role={role}>
+    <>
       <div className="pt-4 pb-2">
         {/* Page title */}
         <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
@@ -170,6 +169,6 @@ export default function Dashboard() {
           }}
         />
       )}
-    </DashboardLayout>
+    </>
   );
 }

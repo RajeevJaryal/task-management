@@ -6,12 +6,13 @@ import {
   Search,
   X,
 } from "lucide-react";
-import { NavLink, useNavigate } from "react-router-dom";
-import { useDispatch } from "react-redux";
+import { NavLink, Outlet, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
 import { logoutUser } from "../store/authSlice";
 
-export function DashboardLayout({ children, role }) {
+export function DashboardLayout() {
   const dispatch = useDispatch();
+  const role = useSelector((s) => s.auth.user?.role || "user");
   const nav = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -162,7 +163,7 @@ export function DashboardLayout({ children, role }) {
 
         {/* Page */}
         <main className="pt-20 lg:pt-20 px-5 lg:px-6 pb-24 lg:pb-8 flex-1">
-          {children}
+          <Outlet />
         </main>
 
         {/* Bottom Navigation Mobile */}

@@ -32,7 +32,7 @@ const norm = (d) => {
 
 export const fetchTasks = createAsyncThunk("tasks/fetch", async () => {
   const snap = await getDocs(
-    query(collection(db, "tasks"), orderBy("createdAt", "desc"))
+    query(collection(db, "tasks"), orderBy("createdAt", "desc")),
   );
 
   return snap.docs.map(norm);
@@ -40,7 +40,7 @@ export const fetchTasks = createAsyncThunk("tasks/fetch", async () => {
 
 export const fetchUsers = createAsyncThunk("tasks/fetchUsers", async () => {
   const snap = await getDocs(
-    query(collection(db, "users"), where("role", "==", "user"))
+    query(collection(db, "users"), where("role", "==", "user")),
   );
 
   return snap.docs.map((d) => ({
@@ -58,8 +58,14 @@ export const createTask = createAsyncThunk("tasks/create", async (task) => {
     status: "pending",
     description: task.description || "No description provided for this task.",
     history: [
-      { text: "Task created by Admin", date: new Date().toISOString() },
-      { text: "Task not started", date: new Date().toISOString() },
+      {
+        text: `${task.assignedByName || "Admin"} created this task`,
+        date: new Date().toISOString(),
+      },
+      {
+        text: "Task not started",
+        date: new Date().toISOString(),
+      },
     ],
     createdAt: serverTimestamp(),
     updatedAt: serverTimestamp(),
@@ -77,9 +83,20 @@ export const createTask = createAsyncThunk("tasks/create", async (task) => {
 
 export const updateTask = createAsyncThunk(
   "tasks/update",
-  async ({ id, changes }) => {
+  async ({ id, changes, actorName = "Admin" }, { getState }) => {
+    const task = getState().tasks.items.find((x) => x.id === id);
+
+    const history = [
+      ...(task?.history || []),
+      {
+        text: `${actorName} updated task details`,
+        date: new Date().toISOString(),
+      },
+    ];
+
     await updateDoc(doc(db, "tasks", id), {
       ...changes,
+      history,
       updatedAt: serverTimestamp(),
     });
 
@@ -87,21 +104,24 @@ export const updateTask = createAsyncThunk(
       id,
       changes: {
         ...changes,
+        history,
         updatedAt: new Date().toISOString(),
       },
     };
-  }
+  },
 );
 
 export const updateTaskStatus = createAsyncThunk(
   "tasks/status",
-  async ({ id, status }, { getState }) => {
+  async ({ id, status, actorName = "User" }, { getState }) => {
     const task = getState().tasks.items.find((x) => x.id === id);
+
+    const oldStatus = task?.status || "pending";
 
     const history = [
       ...(task?.history || []),
       {
-        text: `Status updated to ${status}`,
+        text: `${actorName} changed status from ${oldStatus} to ${status}`,
         date: new Date().toISOString(),
       },
     ];
@@ -120,7 +140,7 @@ export const updateTaskStatus = createAsyncThunk(
         updatedAt: new Date().toISOString(),
       },
     };
-  }
+  },
 );
 
 export const deleteTask = createAsyncThunk("tasks/delete", async (id) => {
