@@ -2,11 +2,11 @@ import authImg from "../assets/auth-illustration.png";
 
 function AuthIllustration() {
   return (
-    <div className="w-full h-full overflow-hidden">
+    <div className="relative h-full w-full overflow-hidden bg-slate-100">
       <img
         src={authImg}
-        alt="Auth"
-        className="w-full h-full object-cover"
+        alt="Authentication illustration"
+        className="h-full w-full object-cover object-center"
       />
     </div>
   );
@@ -14,16 +14,18 @@ function AuthIllustration() {
 
 export default function AuthLayout({ children }) {
   return (
-    <div className="min-h-screen grid grid-cols-1 md:grid-cols-2">
-      {/* Illustration — hidden on mobile */}
-      <div className="hidden md:block h-screen sticky top-0">
+    <div className="min-h-dvh bg-white lg:grid lg:grid-cols-2">
+      {/* Hidden on mobile, visible on PC */}
+      <aside className="hidden lg:block lg:h-dvh lg:sticky lg:top-0">
         <AuthIllustration />
-      </div>
+      </aside>
 
-      {/* Form side */}
-      <div className="flex items-center justify-center px-5 py-10 md:px-8 lg:px-12 min-h-screen">
-        <div className="w-full max-w-md">{children}</div>
-      </div>
+      {/* Full screen form area on mobile */}
+      <main className="flex h-dvh w-full items-center justify-center px-4 py-6 sm:px-6 sm:py-8 lg:px-12">
+        <div className="w-full sm:max-w-md lg:max-w-md">
+          {children}
+        </div>
+      </main>
     </div>
   );
 }
